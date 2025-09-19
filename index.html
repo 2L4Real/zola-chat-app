@@ -602,7 +602,7 @@
 
         // VUI LÒNG DÁN KHÓA API CỦA EM VÀO DÒNG DƯỚI ĐÂY.
         // Em có thể lấy khóa API từ Google AI Studio hoặc một dịch vụ tương tự.
-        const apiKey = "AIzaSyAn-TrvdZ96hUUCquRB5Q7apg2J9TihEQ8";
+        const apiKey = "AIzaSyDRjpE3S1ufTqJ9KzHGbipCzN7CQAQoep0";
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
         const payload = {
@@ -623,7 +623,8 @@
             }
 
             const result = await response.json();
-            const geminiResponseText = result.text || "Chị đang bận, em thử lại sau nhé!";
+            // Điều chỉnh cách đọc phản hồi từ API Gemini để đảm bảo tính an toàn
+            const geminiResponseText = result?.candidates?.[0]?.content?.parts?.[0]?.text || "Chị đang bận, em thử lại sau nhé!";
 
             const lastMessage = chatArea.lastChild;
             if (lastMessage && lastMessage.innerText.includes('...')) {
