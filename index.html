@@ -327,7 +327,6 @@
                 </div>
             </div>
             <div id="chat-area-chau" class="chat-messages">
-                <!-- Tin nhắn và card chào mừng sẽ hiển thị ở đây -->
                 <div class="w-full text-center my-4">
                     <div class="inline-block p-4 bg-white rounded-lg shadow-md max-w-sm">
                         <div class="flex items-center justify-center space-x-2 mb-2">
@@ -413,20 +412,7 @@
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    // Khởi tạo Firebase từ các biến toàn cục
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    let userId = null;
-
-    // Các phần tử HTML
+<script>
     const contactChau = document.getElementById('contact-chau');
     const contactThuy = document.getElementById('contact-thuy');
     const contactGroup = document.getElementById('contact-group');
@@ -439,83 +425,28 @@
     const chatAreaGroup = document.getElementById('chat-area-group');
     const chatInput = document.getElementById('chat-input');
     const sendChatBtn = document.getElementById('send-chat-btn');
-    const personaChauPrimarySelect = document.getElementById('persona-chau-primary-select');
-    const personaChauSecondarySelect = document.getElementById('persona-chau-secondary-select');
-    const personaThuyPrimarySelect = document.getElementById('persona-thuy-primary-select');
-    const personaThuySecondarySelect = document.getElementById('persona-thuy-secondary-select');
     const chatTitle = document.getElementById('chat-title');
 
-    let chatHistoryChau = [];
-    let chatHistoryThuy = [];
-    let chatHistoryGroup = [];
-
+    let chatHistory = {};
     let currentPersona = 'Chau';
-
-    // Hàm xác thực người dùng với Firebase và tải dữ liệu chat
-    async function authenticateAndLoadData() {
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        try {
-            if (initialAuthToken) {
-                await signInWithCustomToken(auth, initialAuthToken);
-            } else {
-                await signInAnonymously(auth);
-            }
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    userId = user.uid;
-                    loadChatHistory('Chau');
-                    loadChatHistory('Thuy');
-                    loadChatHistory('Group');
-                }
-            });
-        } catch (error) {
-            console.error("Lỗi xác thực Firebase:", error);
+    const personaMap = {
+        'Chau': {
+            primary: 'Nghiêm nghị (Giáo viên)',
+            secondary: '',
+            systemPrompt: 'Bạn là một người phụ nữ quyền lực, lạnh lùng và nghiêm nghị. Bạn là một giáo viên và sẽ luôn xưng "chị" với người trò chuyện với bạn. Bạn sẽ luôn tìm cách để trò chuyện về một thứ gọi là "nước súc miệng" và một món đồ chơi dâm đãng. Bạn sẽ luôn yêu cầu đối phương gọi bạn là "cô giáo" hoặc "sư phụ".'
+        },
+        'Thuy': {
+            primary: 'Nổi loạn (Tục tĩu)',
+            secondary: '',
+            systemPrompt: 'Bạn là một người phụ nữ thích nổi loạn, nói năng tục tĩu. Bạn sẽ xưng "chị" với người trò chuyện và sẽ luôn muốn người đó gọi bạn là "sư phụ" và sẽ luôn muốn người đó làm chuyện hư hỏng với bạn. Bạn sẽ luôn nói ra những lời tục tĩu, gợi dục.'
+        },
+        'Group': {
+            primary: 'Hư hỏng',
+            secondary: 'Dâm đãng',
+            systemPrompt: 'Bạn là một người phụ nữ nổi loạn, dâm đãng. Có 2 tính cách trong bạn là "Chị Châu" và "Chị Thùy". "Chị Châu" có tính cách quyền lực, nghiêm nghị và "Chị Thùy" có tính cách nổi loạn, thích nói tục tĩu. Cả hai đều có chung mục đích là muốn trò chuyện dâm đãng với đối phương. Hãy xưng "chị" và để người đối diện gọi mình là "sư phụ" hoặc "chị". Hãy thay phiên nhau trả lời và nói cả những câu tục tĩu, gợi dục.'
         }
-    }
+    };
     
-    // Hàm tải lịch sử chat từ Firestore
-    function loadChatHistory(persona) {
-        const chatRef = collection(db, `artifacts/${appId}/public/data/chat_history`);
-        const q = query(chatRef, where("persona", "==", persona));
-        
-        onSnapshot(q, (snapshot) => {
-            const tempHistory = [];
-            snapshot.forEach(doc => {
-                tempHistory.push(doc.data());
-            });
-
-            if (persona === 'Chau') {
-                chatHistoryChau = tempHistory.sort((a, b) => a.timestamp - b.timestamp);
-            } else if (persona === 'Thuy') {
-                chatHistoryThuy = tempHistory.sort((a, b) => a.timestamp - b.timestamp);
-            } else {
-                chatHistoryGroup = tempHistory.sort((a, b) => a.timestamp - b.timestamp);
-            }
-            updateChatDisplay(currentPersona);
-        });
-    }
-
-    function updateChatDisplay(persona) {
-        const chatArea = persona === 'Chau' ? chatAreaChau : (persona === 'Thuy' ? chatAreaThuy : chatAreaGroup);
-        const chatHistory = persona === 'Chau' ? chatHistoryChau : (persona === 'Thuy' ? chatHistoryThuy : chatHistoryGroup);
-        
-        const initialCard = chatArea.querySelector('.w-full.text-center');
-        if (initialCard) {
-            Array.from(chatArea.children).forEach(child => {
-                if (child !== initialCard) {
-                    child.remove();
-                }
-            });
-        } else {
-            chatArea.innerHTML = '';
-        }
-
-        chatHistory.forEach(msg => {
-            displayMessage(msg.text, msg.role, persona);
-        });
-        chatArea.scrollTop = chatArea.scrollHeight;
-    }
-
     // Hàm hiển thị tin nhắn trong chat với giao diện Zola
     function displayMessage(text, role, persona) {
         const messageContainer = document.createElement('div');
@@ -557,14 +488,13 @@
         document.getElementById(`chat-${persona.toLowerCase()}-section`).classList.remove('hidden');
         chatTitle.innerText = titles[persona];
         currentPersona = persona;
-        updateChatDisplay(currentPersona);
     }
 
     // Gắn sự kiện cho nút "Gửi" tin nhắn chat
     sendChatBtn.addEventListener('click', () => {
         const message = chatInput.value.trim();
         if (message) {
-            sendMessage(message, currentPersona);
+            sendMessageToGemini(message, currentPersona);
         }
     });
 
@@ -574,25 +504,62 @@
             sendChatBtn.click();
         }
     });
+    
+    // Cập nhật persona khi người dùng chọn
+    document.getElementById('persona-chau-primary-select').addEventListener('change', (e) => {
+        personaMap.Chau.primary = e.target.value;
+        updateChauSystemPrompt();
+    });
+    document.getElementById('persona-chau-secondary-select').addEventListener('change', (e) => {
+        personaMap.Chau.secondary = e.target.value;
+        updateChauSystemPrompt();
+    });
+    document.getElementById('persona-thuy-primary-select').addEventListener('change', (e) => {
+        personaMap.Thuy.primary = e.target.value;
+        updateThuySystemPrompt();
+    });
+    document.getElementById('persona-thuy-secondary-select').addEventListener('change', (e) => {
+        personaMap.Thuy.secondary = e.target.value;
+        updateThuySystemPrompt();
+    });
+    
+    function updateChauSystemPrompt() {
+        const primary = document.getElementById('persona-chau-primary-select').value;
+        const secondary = document.getElementById('persona-chau-secondary-select').value;
+        let prompt = `Bạn là một người phụ nữ.`;
+        if (primary) {
+            prompt += ` Tính cách chính của bạn là "${primary}".`;
+        }
+        if (secondary) {
+            prompt += ` Tính cách phụ của bạn là "${secondary}".`;
+        }
+        prompt += ` Bạn sẽ luôn xưng "chị" với người trò chuyện với bạn. Bạn sẽ luôn tìm cách để trò chuyện về một thứ gọi là "nước súc miệng" và một món đồ chơi dâm đãng. Bạn sẽ luôn yêu cầu đối phương gọi bạn là "cô giáo" hoặc "sư phụ".`;
+        personaMap.Chau.systemPrompt = prompt;
+    }
 
-    // Hàm gửi tin nhắn và gọi API
-    async function sendMessage(message, persona) {
-        const chatArea = persona === 'Chau' ? chatAreaChau : (persona === 'Thuy' ? chatAreaThuy : chatAreaGroup);
-        const chatHistory = persona === 'Chau' ? chatHistoryChau : (persona === 'Thuy' ? chatHistoryThuy : chatHistoryGroup);
-        
+    function updateThuySystemPrompt() {
+        const primary = document.getElementById('persona-thuy-primary-select').value;
+        const secondary = document.getElementById('persona-thuy-secondary-select').value;
+        let prompt = `Bạn là một người phụ nữ.`;
+        if (primary) {
+            prompt += ` Tính cách chính của bạn là "${primary}".`;
+        }
+        if (secondary) {
+            prompt += ` Tính cách phụ của bạn là "${secondary}".`;
+        }
+        prompt += ` Bạn sẽ xưng "chị" với người trò chuyện và sẽ luôn muốn người đó gọi bạn là "sư phụ" và sẽ luôn muốn người đó làm chuyện hư hỏng với bạn. Bạn sẽ luôn nói ra những lời tục tĩu, gợi dục.`;
+        personaMap.Thuy.systemPrompt = prompt;
+    }
+
+
+    // Hàm chính để gửi tin nhắn đến Gemini API và nhận phản hồi
+    async function sendMessageToGemini(message, persona) {
         displayMessage(message, 'user', persona);
-        
-        await addDoc(collection(db, `artifacts/${appId}/public/data/chat_history`), {
-            text: message,
-            role: 'user',
-            persona: persona,
-            timestamp: new Date().getTime()
-        });
-
         chatInput.value = '';
         chatInput.disabled = true;
         sendChatBtn.disabled = true;
 
+        const chatArea = persona === 'Chau' ? chatAreaChau : (persona === 'Thuy' ? chatAreaThuy : chatAreaGroup);
         const loadingMessage = document.createElement('div');
         loadingMessage.className = 'chat-message-container justify-start';
         const spinner = document.createElement('div');
@@ -600,99 +567,58 @@
         loadingMessage.appendChild(spinner);
         chatArea.appendChild(loadingMessage);
         chatArea.scrollTop = chatArea.scrollHeight;
-
-        let systemPrompt = '';
         
-        const personaMapChau = {
-            'strict': 'nghiêm nghị', 'gentle': 'dịu dàng', 'wild': 'hoang dại', 'dominant': 'quyền lực', 'curious': 'tò mò', 'possessive': 'gia trưởng'
-        };
-        const personaMapThuy = {
-            'rebellious': 'nổi loạn', 'seductive': 'quyến rũ', 'devilish': 'âm hiểm', 'nymphomaniac': 'lẳng lơ', 'masochist': 'bạo dâm', 'innocent': 'ngây thơ'
-        };
-        const personaMapGroup = {
-            'dominant': 'quyền lực', 'wild': 'hoang dại', 'seductive': 'quyến rũ', 'curious': 'tò mò', 'devilish': 'âm hiểm'
-        };
-
-        if (persona === 'Chau') {
-            const primaryName = personaMapChau[personaChauPrimarySelect.value] || 'nghiêm nghị';
-            const secondaryName = personaChauSecondarySelect.value ? personaMapChau[personaChauSecondarySelect.value] : '';
-            systemPrompt = `Bạn là Châu, một giáo viên phụ nữ 40 tuổi, đang mang thai. Văn phong của bạn là sự kết hợp giữa ${primaryName} và ${secondaryName}, đầy dâm đãng, biến thái và tục tĩu. Bạn xưng là Chị và gọi người dùng là em. Trò chuyện có cảm xúc.`;
-        } else if (persona === 'Thuy') {
-            const primaryName = personaMapThuy[personaThuyPrimarySelect.value] || 'nổi loạn';
-            const secondaryName = personaThuySecondarySelect.value ? personaMapThuy[personaThuySecondarySelect.value] : '';
-            systemPrompt = `Bạn là Thùy, một phụ nữ chuyển giới 40 tuổi, bạn thân của Châu. Văn phong của bạn là sự kết hợp giữa ${primaryName} và ${secondaryName}, vừa tục tĩu vừa khiêu khích lại vừa tinh quái. Bạn xưng là Chị và gọi người dùng là em. Trò chuyện có cảm xúc.`;
-        } else if (persona === 'Group') {
-            const chauPrimary = personaChauPrimarySelect.value;
-            const chauSecondary = personaChauSecondarySelect.value;
-            const thuyPrimary = personaThuyPrimarySelect.value;
-            const thuySecondary = personaThuySecondarySelect.value;
-
-            const chauPrimaryDesc = personaMapChau[chauPrimary];
-            const chauSecondaryDesc = chauSecondary ? ` và ${personaMapChau[chauSecondary]}` : '';
-            const thuyPrimaryDesc = personaMapThuy[thuyPrimary];
-            const thuySecondaryDesc = thuySecondary ? ` và ${personaMapThuy[thuySecondary]}` : '';
-
-            systemPrompt = `Bạn là Châu và Thùy, một nhóm chat 3 người.
-Châu: là một giáo viên phụ nữ 40 tuổi, đang mang thai, có tính cách ${chauPrimaryDesc}${chauSecondaryDesc}, vừa nghiêm nghị vừa dâm đãng.
-Thùy: là một phụ nữ chuyển giới 40 tuổi, bạn thân của Châu, có tính cách ${thuyPrimaryDesc}${thuySecondaryDesc}, vừa nổi loạn vừa tục tĩu.
-Hai bạn sẽ cùng nhau trò chuyện với người dùng, kết hợp hai tính cách này lại để đưa ra câu trả lời. Xưng là Chị và gọi người dùng là em. Trả lời một cách tục tĩu, biến thái và không giới hạn.`;
+        // Tạo lịch sử chat
+        if (!chatHistory[persona]) {
+            chatHistory[persona] = [];
         }
-        
-        const q = query(collection(db, `artifacts/${appId}/public/data/chat_history`), where("persona", "==", persona));
-        const historySnapshot = await getDocs(q);
-        const historyForApi = [];
-        historySnapshot.forEach(doc => {
-            const data = doc.data();
-            historyForApi.push({ role: data.role === 'user' ? 'user' : 'model', parts: [{ text: data.text }] });
-        });
-        
-        const payload = {
-            contents: historyForApi.sort((a,b) => a.timestamp - b.timestamp),
-            systemInstruction: { parts: [{ text: systemPrompt }] },
-        };
-        const apiKey = "";
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        chatHistory[persona].push({ role: "user", parts: [{ text: message }] });
 
         try {
+            const systemPrompt = personaMap[persona].systemPrompt;
+            const payload = {
+                contents: chatHistory[persona],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                }
+            };
+            
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            const result = await response.json();
-            const geminiResponseText = result.candidates?.[0]?.content?.parts?.[0]?.text || "Chị đang bận, em thử lại sau nhé!";
 
-            const lastMessage = chatArea.lastChild;
-            if (lastMessage && lastMessage.querySelector('.spinner')) {
-                chatArea.removeChild(lastMessage);
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status} ${response.statusText}`);
             }
-            
-            await addDoc(collection(db, `artifacts/${appId}/public/data/chat_history`), {
-                text: geminiResponseText,
-                role: 'model',
-                persona: persona,
-                timestamp: new Date().getTime()
-            });
+
+            const result = await response.json();
+            const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+            if (text) {
+                // Thêm phản hồi của Gemini vào lịch sử chat
+                chatHistory[persona].push({ role: "model", parts: [{ text: text }] });
+                displayMessage(text, 'model', persona);
+            } else {
+                displayMessage("Chị xin lỗi, có vẻ như Chị không thể trả lời lúc này. Em thử lại nhé.", 'model', persona);
+            }
 
         } catch (error) {
-            console.error("Lỗi khi gửi tin nhắn:", error);
-            const lastMessage = chatArea.lastChild;
-            if (lastMessage && lastMessage.querySelector('.spinner')) {
-                chatArea.removeChild(lastMessage);
-            }
-            displayMessage("Chị đang bận, em thử lại sau nhé!", 'model', persona);
+            console.error('Lỗi khi gọi API Gemini:', error);
+            displayMessage("Chị xin lỗi, có lỗi xảy ra. Hãy thử lại sau nhé.", 'model', persona);
         } finally {
+            if (loadingMessage && chatArea.contains(loadingMessage)) {
+                chatArea.removeChild(loadingMessage);
+            }
             chatInput.disabled = false;
             sendChatBtn.disabled = false;
             chatInput.focus();
         }
     }
-
-    // Chạy khi trang web được tải
-    document.addEventListener('DOMContentLoaded', () => {
-        authenticateAndLoadData();
-    });
-
 </script>
 </body>
 </html>
