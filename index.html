@@ -632,6 +632,7 @@
             'masochist': 'bạo dâm', 'innocent': 'ngây thơ'
         };
         
+        // Tạo mảng 'contents' từ lịch sử chat và thêm tin nhắn mới nhất
         const contents = chatHistory.map(msg => ({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.text }] }));
         contents.push({ role: 'user', parts: [{ text: message }] });
 
@@ -674,11 +675,20 @@
             };
         }
 
+        // Kiểm tra xem payload.contents có rỗng không trước khi gửi
+        if (!payload.contents || payload.contents.length === 0) {
+            console.error("Lỗi: Không có nội dung để gửi đến API.");
+            if (loadingMessage && loadingMessage.parentNode) {
+                loadingMessage.parentNode.removeChild(loadingMessage);
+            }
+            chatInput.disabled = false;
+            sendChatBtn.disabled = false;
+            chatInput.focus();
+            return;
+        }
+
         const apiKey = "AIzaSyDRjpE3S1ufTqJ9KzHGbipCzN7CQAQoep0";
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-        console.log("Sử dụng URL API:", apiUrl);
-        console.log("Khóa API (được cung cấp bởi môi trường):", apiKey);
 
         try {
             const response = await fetch(apiUrl, {
