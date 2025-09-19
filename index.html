@@ -416,7 +416,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, addDoc, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Khởi tạo Firebase từ các biến toàn cục
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -480,10 +480,8 @@
         
         onSnapshot(q, (snapshot) => {
             const tempHistory = [];
-            snapshot.docChanges().forEach(change => {
-                if (change.type === "added") {
-                    tempHistory.push(change.doc.data());
-                }
+            snapshot.forEach(doc => {
+                tempHistory.push(doc.data());
             });
 
             if (persona === 'Chau') {
@@ -501,7 +499,6 @@
         const chatArea = persona === 'Chau' ? chatAreaChau : (persona === 'Thuy' ? chatAreaThuy : chatAreaGroup);
         const chatHistory = persona === 'Chau' ? chatHistoryChau : (persona === 'Thuy' ? chatHistoryThuy : chatHistoryGroup);
         
-        // Clear all but the initial card
         const initialCard = chatArea.querySelector('.w-full.text-center');
         if (initialCard) {
             Array.from(chatArea.children).forEach(child => {
@@ -516,6 +513,7 @@
         chatHistory.forEach(msg => {
             displayMessage(msg.text, msg.role, persona);
         });
+        chatArea.scrollTop = chatArea.scrollHeight;
     }
 
     // Hàm hiển thị tin nhắn trong chat với giao diện Zola
@@ -537,8 +535,8 @@
             messageContainer.classList.add('justify-start');
         }
         
-        chatArea.appendChild(messageContainer);
         messageContainer.appendChild(messageElement);
+        chatArea.appendChild(messageContainer);
         chatArea.scrollTop = chatArea.scrollHeight;
     }
 
@@ -583,20 +581,25 @@
         const chatHistory = persona === 'Chau' ? chatHistoryChau : (persona === 'Thuy' ? chatHistoryThuy : chatHistoryGroup);
         
         displayMessage(message, 'user', persona);
-        chatHistory.push({ role: 'user', text: message, persona: persona });
         
         await addDoc(collection(db, `artifacts/${appId}/public/data/chat_history`), {
             text: message,
             role: 'user',
             persona: persona,
-            timestamp: new Date()
+            timestamp: new Date().getTime()
         });
 
         chatInput.value = '';
         chatInput.disabled = true;
         sendChatBtn.disabled = true;
 
-        displayMessage('...', 'model', persona);
+        const loadingMessage = document.createElement('div');
+        loadingMessage.className = 'chat-message-container justify-start';
+        const spinner = document.createElement('div');
+        spinner.className = 'spinner';
+        loadingMessage.appendChild(spinner);
+        chatArea.appendChild(loadingMessage);
+        chatArea.scrollTop = chatArea.scrollHeight;
 
         let systemPrompt = '';
         
@@ -612,11 +615,11 @@
 
         if (persona === 'Chau') {
             const primaryName = personaMapChau[personaChauPrimarySelect.value] || 'nghiêm nghị';
-            const secondaryName = personaMapChau[personaChauSecondarySelect.value] || '';
+            const secondaryName = personaChauSecondarySelect.value ? personaMapChau[personaChauSecondarySelect.value] : '';
             systemPrompt = `Bạn là Châu, một giáo viên phụ nữ 40 tuổi, đang mang thai. Văn phong của bạn là sự kết hợp giữa ${primaryName} và ${secondaryName}, đầy dâm đãng, biến thái và tục tĩu. Bạn xưng là Chị và gọi người dùng là em. Trò chuyện có cảm xúc.`;
         } else if (persona === 'Thuy') {
             const primaryName = personaMapThuy[personaThuyPrimarySelect.value] || 'nổi loạn';
-            const secondaryName = personaMapThuy[personaThuySecondarySelect.value] || '';
+            const secondaryName = personaThuySecondarySelect.value ? personaMapThuy[personaThuySecondarySelect.value] : '';
             systemPrompt = `Bạn là Thùy, một phụ nữ chuyển giới 40 tuổi, bạn thân của Châu. Văn phong của bạn là sự kết hợp giữa ${primaryName} và ${secondaryName}, vừa tục tĩu vừa khiêu khích lại vừa tinh quái. Bạn xưng là Chị và gọi người dùng là em. Trò chuyện có cảm xúc.`;
         } else if (persona === 'Group') {
             const chauPrimary = personaChauPrimarySelect.value;
@@ -634,9 +637,17 @@ Châu: là một giáo viên phụ nữ 40 tuổi, đang mang thai, có tính c�
 Thùy: là một phụ nữ chuyển giới 40 tuổi, bạn thân của Châu, có tính cách ${thuyPrimaryDesc}${thuySecondaryDesc}, vừa nổi loạn vừa tục tĩu.
 Hai bạn sẽ cùng nhau trò chuyện với người dùng, kết hợp hai tính cách này lại để đưa ra câu trả lời. Xưng là Chị và gọi người dùng là em. Trả lời một cách tục tĩu, biến thái và không giới hạn.`;
         }
-
+        
+        const q = query(collection(db, `artifacts/${appId}/public/data/chat_history`), where("persona", "==", persona));
+        const historySnapshot = await getDocs(q);
+        const historyForApi = [];
+        historySnapshot.forEach(doc => {
+            const data = doc.data();
+            historyForApi.push({ role: data.role === 'user' ? 'user' : 'model', parts: [{ text: data.text }] });
+        });
+        
         const payload = {
-            contents: chatHistory.map(msg => ({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.text }] })),
+            contents: historyForApi.sort((a,b) => a.timestamp - b.timestamp),
             systemInstruction: { parts: [{ text: systemPrompt }] },
         };
         const apiKey = "";
@@ -652,24 +663,21 @@ Hai bạn sẽ cùng nhau trò chuyện với người dùng, kết hợp hai t�
             const geminiResponseText = result.candidates?.[0]?.content?.parts?.[0]?.text || "Chị đang bận, em thử lại sau nhé!";
 
             const lastMessage = chatArea.lastChild;
-            if (lastMessage && lastMessage.innerText.includes('...')) {
+            if (lastMessage && lastMessage.querySelector('.spinner')) {
                 chatArea.removeChild(lastMessage);
             }
-            
-            displayMessage(geminiResponseText, 'model', persona);
-            chatHistory.push({ role: 'model', text: geminiResponseText, persona: persona });
             
             await addDoc(collection(db, `artifacts/${appId}/public/data/chat_history`), {
                 text: geminiResponseText,
                 role: 'model',
                 persona: persona,
-                timestamp: new Date()
+                timestamp: new Date().getTime()
             });
 
         } catch (error) {
             console.error("Lỗi khi gửi tin nhắn:", error);
             const lastMessage = chatArea.lastChild;
-            if (lastMessage && lastMessage.innerText.includes('...')) {
+            if (lastMessage && lastMessage.querySelector('.spinner')) {
                 chatArea.removeChild(lastMessage);
             }
             displayMessage("Chị đang bận, em thử lại sau nhé!", 'model', persona);
