@@ -3,63 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZOLA</title>
+    <title>Trò Chuyện Cùng Chị Châu & Chị Thùy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #ffffff;
+            background-color: #f0f0f0;
             color: #333;
         }
-        .zola-container {
+        .zalo-web-container {
             display: flex;
             width: 90%;
             height: 90vh;
             max-width: 1200px;
-            background-color: #f8f8f8;
+            background-color: #f5f5f5;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
         }
-        .zola-sidebar {
+        .zalo-sidebar {
             width: 70px;
-            background-color: #fff;
+            background-color: #e6e6e6;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-top: 1.5rem;
-            border-right: 1px solid #e6e6e6;
+            padding-top: 1rem;
+            border-right: 1px solid #ccc;
         }
-        .zola-nav-item {
+        .zalo-nav-item {
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 1rem 0;
+            padding: 0.75rem 0;
             cursor: pointer;
             color: #666;
             font-size: 0.8rem;
             text-align: center;
-            transition: background-color 0.2s, color 0.2s;
+            transition: background-color 0.2s;
         }
-        .zola-nav-item:hover {
-            background-color: #f0f0f0;
+        .zalo-nav-item:hover {
+            background-color: #d9d9d9;
+        }
+        .zalo-nav-item.active {
             color: #0073e6;
+            background-color: #d9d9d9;
         }
-        .zola-nav-item.active {
-            color: #0073e6;
-            background-color: #e6f7ff;
-            border-left: 3px solid #0073e6;
-        }
-        .zola-nav-item svg {
+        .zalo-nav-item svg {
             fill: currentColor;
             width: 28px;
             height: 28px;
             margin-bottom: 4px;
         }
-        .zola-contact-list {
+        .zalo-contact-list {
             width: 300px;
             background-color: #fff;
             border-right: 1px solid #e6e6e6;
@@ -83,6 +81,7 @@
             width: 48px;
             height: 48px;
             border-radius: 50%;
+            background-color: #ccc;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -112,7 +111,7 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            background-color: #fafafa;
+            background-color: #ffffff;
         }
         .chat-header {
             background-color: #fff;
@@ -121,94 +120,81 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
         }
         .chat-header .title {
             font-weight: bold;
             color: #333;
-            font-size: 1.25rem;
         }
         .chat-header-actions svg {
             width: 24px;
             height: 24px;
             cursor: pointer;
             fill: #666;
-            transition: fill 0.2s;
-        }
-        .chat-header-actions svg:hover {
-            fill: #0073e6;
         }
         .chat-messages {
             flex-grow: 1;
-            padding: 1.5rem;
+            padding: 1rem 1.5rem;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
         }
         .chat-message-container {
             display: flex;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
         .chat-message {
             max-width: 75%;
-            padding: 0.8rem 1.2rem;
-            border-radius: 20px;
-            font-size: 0.95rem;
+            padding: 0.6rem 1rem;
+            border-radius: 18px;
+            font-size: 0.9rem;
             word-wrap: break-word;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
         .user-message {
-            background-color: #0073e6;
+            background-color: #0087e6;
             color: white;
             margin-left: auto;
-            border-bottom-right-radius: 8px;
+            border-bottom-right-radius: 4px;
         }
         .gemini-message {
             background-color: #fff;
             color: #333;
             margin-right: auto;
-            border-bottom-left-radius: 8px;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
         .chat-input-area {
             background-color: #fff;
-            padding: 1rem 1.5rem;
+            padding: 0.5rem 1.5rem;
             display: flex;
             align-items: center;
-            border-top: 1px solid #e6e6e6;
-            box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
+            border-top: 1px solid #ccc;
         }
         .chat-input {
             flex-grow: 1;
-            padding: 0.8rem 1.2rem;
-            border-radius: 24px;
-            background-color: #f0f2f5;
+            padding: 0.75rem 1rem;
+            border-radius: 20px;
+            background-color: #f0f0f0;
             border: none;
             font-size: 1rem;
             color: #333;
-            margin-right: 0.75rem;
+            margin-right: 0.5rem;
             outline: none;
-            transition: box-shadow 0.2s;
-        }
-        .chat-input:focus {
-            box-shadow: 0 0 0 2px rgba(0, 115, 230, 0.3);
         }
         .send-btn {
             background-color: #0073e6;
             color: white;
             border-radius: 50%;
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 1.2rem;
-            transition: background-color 0.2s, transform 0.2s;
+            transition: background-color 0.2s;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         .send-btn:hover {
             background-color: #005bb5;
-            transform: scale(1.05);
         }
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
@@ -225,32 +211,31 @@
         .persona-select-container {
             padding: 1rem;
             background-color: #fff;
-            border-radius: 12px;
+            border-radius: 8px;
             margin-bottom: 1rem;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
-<body class="p-4 flex justify-center items-center h-screen bg-gray-100">
+<body class="p-4 flex justify-center items-center h-screen bg-gray-900">
 
-<div class="zola-container mx-auto">
+<div class="zalo-web-container mx-auto">
     <!-- Sidebar -->
-    <div class="zola-sidebar">
-        <div class="zola-nav-item active">
+    <div class="zalo-sidebar">
+        <div class="zalo-nav-item active">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2c-3.86 0-7 3.14-7 7s7 13 7 13 7-9.14 7-13-3.14-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
             <span>Nhắn tin</span>
         </div>
-        <div class="zola-nav-item">
+        <div class="zalo-nav-item">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2c-3.86 0-7 3.14-7 7s7 13 7 13 7-9.14 7-13-3.14-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
             <span>Danh bạ</span>
         </div>
     </div>
     <!-- Contact List -->
-    <div class="zola-contact-list">
+    <div class="zalo-contact-list">
         <div class="contact-item active" id="contact-chau">
             <div class="avatar bg-purple-600">C</div>
             <div class="contact-info">
@@ -269,19 +254,6 @@
                 </div>
             </div>
         </div>
-        <div class="contact-item" id="contact-group">
-            <div class="avatar bg-blue-500">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
-                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.07 1.11.85 1.94 1.94 2.45 3.18.3.75.45 1.54.45 2.25V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-                </svg>
-            </div>
-            <div class="contact-info">
-                <div>
-                    <div class="contact-name">Nhóm chat 3 người</div>
-                    <div class="contact-message">Cả hai chị đều ở đây...</div>
-                </div>
-            </div>
-        </div>
     </div>
     <!-- Chat Area -->
     <div class="chat-area-container">
@@ -294,7 +266,7 @@
         </div>
         
         <!-- Chat Content -->
-        <div id="chat-chau-section" class="chat-section">
+        <div id="chat-chau-section" class="chat-section hidden">
             <div class="persona-select-container">
                 <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 w-full">
                     <div class="flex items-center space-x-2">
@@ -304,10 +276,6 @@
                             <option value="gentle">Dịu dàng (Yêu chiều)</option>
                             <option value="wild">Hoang dại (Dâm đãng)</option>
                             <option value="dominant">Quyền lực (Độc đoán)</option>
-                            <option value="curious">Tò mò (Khám phá)</option>
-                            <option value="possessive">Gia trưởng (Chiếm hữu)</option>
-                            <option value="seductive">Quyến rũ (Khiêu khích)</option>
-                            <option value="nymphomaniac">Lẳng lơ (Gợi tình)</option>
                         </select>
                     </div>
                     <div class="flex items-center space-x-2">
@@ -320,13 +288,12 @@
                             <option value="dominant">Quyền lực (Độc đoán)</option>
                             <option value="curious">Tò mò (Khám phá)</option>
                             <option value="possessive">Gia trưởng (Chiếm hữu)</option>
-                            <option value="seductive">Quyến rũ (Khiêu khích)</option>
-                            <option value="nymphomaniac">Lẳng lơ (Gợi tình)</option>
                         </select>
                     </div>
                 </div>
             </div>
             <div id="chat-area-chau" class="chat-messages">
+                <!-- Tin nhắn và card chào mừng sẽ hiển thị ở đây -->
                 <div class="w-full text-center my-4">
                     <div class="inline-block p-4 bg-white rounded-lg shadow-md max-w-sm">
                         <div class="flex items-center justify-center space-x-2 mb-2">
@@ -351,8 +318,6 @@
                             <option value="seductive">Quyến rũ (Khiêu khích)</option>
                             <option value="devilish">Âm hiểm (Gian xảo)</option>
                             <option value="nymphomaniac">Lẳng lơ (Gợi tình)</option>
-                            <option value="masochist">Bạo dâm (Táo bạo)</option>
-                            <option value="innocent">Ngây thơ (Ngọt ngào)</option>
                         </select>
                     </div>
                     <div class="flex items-center space-x-2">
@@ -383,22 +348,6 @@
                 </div>
             </div>
         </div>
-        
-        <div id="chat-group-section" class="chat-section hidden">
-            <div id="chat-area-group" class="chat-messages">
-                <div class="w-full text-center my-4">
-                    <div class="inline-block p-4 bg-white rounded-lg shadow-md max-w-sm">
-                        <div class="flex items-center justify-center space-x-2 mb-2">
-                            <span class="text-3xl">👩‍❤️‍💋‍👩</span>
-                            <span class="text-3xl">😈</span>
-                            <span class="text-3xl">🔥</span>
-                        </div>
-                        <p class="text-gray-800 font-bold mb-2">Bạn đã tham gia cuộc trò chuyện 3 người</p>
-                        <p class="text-gray-600">Chị Châu và Chị Thùy đang chờ em... Hãy ngoan ngoãn nhé!</p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Input Area -->
         <div class="chat-input-area">
@@ -412,42 +361,107 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, addDoc, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Khởi tạo Firebase từ các biến toàn cục
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    let userId = null;
+
+    // Các phần tử HTML
     const contactChau = document.getElementById('contact-chau');
     const contactThuy = document.getElementById('contact-thuy');
-    const contactGroup = document.getElementById('contact-group');
     const chatChauSection = document.getElementById('chat-chau-section');
     const chatThuySection = document.getElementById('chat-thuy-section');
-    const chatGroupSection = document.getElementById('chat-group-section');
 
     const chatAreaChau = document.getElementById('chat-area-chau');
-    const chatAreaThuy = document.getElementById('chat-area-thuy');
-    const chatAreaGroup = document.getElementById('chat-area-group');
     const chatInput = document.getElementById('chat-input');
     const sendChatBtn = document.getElementById('send-chat-btn');
+    const personaChauPrimarySelect = document.getElementById('persona-chau-primary-select');
+    const personaChauSecondarySelect = document.getElementById('persona-chau-secondary-select');
+    const personaThuyPrimarySelect = document.getElementById('persona-thuy-primary-select');
+    const personaThuySecondarySelect = document.getElementById('persona-thuy-secondary-select');
     const chatTitle = document.getElementById('chat-title');
 
-    let chatHistory = {};
+    const chatAreaThuy = document.getElementById('chat-area-thuy');
+
+    let chatHistoryChau = [];
+    let chatHistoryThuy = [];
+
     let currentPersona = 'Chau';
-    const personaMap = {
-        'Chau': {
-            primary: 'Nghiêm nghị (Giáo viên)',
-            secondary: '',
-            systemPrompt: 'Bạn là một người phụ nữ quyền lực, lạnh lùng và nghiêm nghị. Bạn là một giáo viên và sẽ luôn xưng "chị" với người trò chuyện với bạn. Bạn sẽ luôn tìm cách để trò chuyện về một thứ gọi là "nước súc miệng" và một món đồ chơi dâm đãng. Bạn sẽ luôn yêu cầu đối phương gọi bạn là "cô giáo" hoặc "sư phụ".'
-        },
-        'Thuy': {
-            primary: 'Nổi loạn (Tục tĩu)',
-            secondary: '',
-            systemPrompt: 'Bạn là một người phụ nữ thích nổi loạn, nói năng tục tĩu. Bạn sẽ xưng "chị" với người trò chuyện và sẽ luôn muốn người đó gọi bạn là "sư phụ" và sẽ luôn muốn người đó làm chuyện hư hỏng với bạn. Bạn sẽ luôn nói ra những lời tục tĩu, gợi dục.'
-        },
-        'Group': {
-            primary: 'Hư hỏng',
-            secondary: 'Dâm đãng',
-            systemPrompt: 'Bạn là một người phụ nữ nổi loạn, dâm đãng. Có 2 tính cách trong bạn là "Chị Châu" và "Chị Thùy". "Chị Châu" có tính cách quyền lực, nghiêm nghị và "Chị Thùy" có tính cách nổi loạn, thích nói tục tĩu. Cả hai đều có chung mục đích là muốn trò chuyện dâm đãng với đối phương. Hãy xưng "chị" và để người đối diện gọi mình là "sư phụ" hoặc "chị". Hãy thay phiên nhau trả lời và nói cả những câu tục tĩu, gợi dục.'
+
+    // Hàm xác thực người dùng với Firebase và tải dữ liệu chat
+    async function authenticateAndLoadData() {
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        try {
+            if (initialAuthToken) {
+                await signInWithCustomToken(auth, initialAuthToken);
+            } else {
+                await signInAnonymously(auth);
+            }
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    userId = user.uid;
+                    loadChatHistory('Chau');
+                    loadChatHistory('Thuy');
+                }
+            });
+        } catch (error) {
+            console.error("Lỗi xác thực Firebase:", error);
         }
-    };
+    }
     
-    // Hàm hiển thị tin nhắn trong chat với giao diện Zola
+    // Hàm tải lịch sử chat từ Firestore
+    function loadChatHistory(persona) {
+        const chatRef = collection(db, `artifacts/${appId}/public/data/chat_history`);
+        const q = query(chatRef, where("persona", "==", persona));
+        
+        onSnapshot(q, (snapshot) => {
+            const tempHistory = [];
+            snapshot.docChanges().forEach(change => {
+                if (change.type === "added") {
+                    tempHistory.push(change.doc.data());
+                }
+            });
+
+            if (persona === 'Chau') {
+                chatHistoryChau = tempHistory.sort((a, b) => a.timestamp - b.timestamp);
+                updateChatDisplay('Chau');
+            } else {
+                chatHistoryThuy = tempHistory.sort((a, b) => a.timestamp - b.timestamp);
+                updateChatDisplay('Thuy');
+            }
+        });
+    }
+
+    function updateChatDisplay(persona) {
+        const chatArea = persona === 'Chau' ? chatAreaChau : chatAreaThuy;
+        const chatHistory = persona === 'Chau' ? chatHistoryChau : chatHistoryThuy;
+        
+        // Clear all but the initial card
+        const initialCard = chatArea.querySelector('.w-full.text-center');
+        if (initialCard) {
+            Array.from(chatArea.children).forEach(child => {
+                if (child !== initialCard) {
+                    child.remove();
+                }
+            });
+        } else {
+            chatArea.innerHTML = '';
+        }
+
+        chatHistory.forEach(msg => {
+            displayMessage(msg.text, msg.role, persona);
+        });
+    }
+
+    // Hàm hiển thị tin nhắn trong chat với giao diện Zalo
     function displayMessage(text, role, persona) {
         const messageContainer = document.createElement('div');
         messageContainer.className = 'chat-message-container';
@@ -456,7 +470,7 @@
         messageElement.className = 'chat-message';
         messageElement.innerText = text;
 
-        const chatArea = persona === 'Chau' ? chatAreaChau : (persona === 'Thuy' ? chatAreaThuy : chatAreaGroup);
+        const chatArea = persona === 'Chau' ? chatAreaChau : chatAreaThuy;
 
         if (role === 'user') {
             messageElement.classList.add('user-message');
@@ -466,35 +480,37 @@
             messageContainer.classList.add('justify-start');
         }
         
-        messageContainer.appendChild(messageElement);
         chatArea.appendChild(messageContainer);
+        messageContainer.appendChild(messageElement);
         chatArea.scrollTop = chatArea.scrollHeight;
     }
 
     // Gắn sự kiện chuyển tab
-    contactChau.addEventListener('click', () => switchChat('Chau'));
-    contactThuy.addEventListener('click', () => switchChat('Thuy'));
-    contactGroup.addEventListener('click', () => switchChat('Group'));
+    contactChau.addEventListener('click', () => {
+        contactChau.classList.add('active');
+        contactThuy.classList.remove('active');
+        chatChauSection.classList.remove('hidden');
+        chatThuySection.classList.add('hidden');
+        currentPersona = 'Chau';
+        chatTitle.innerText = 'Chị Châu';
+        updateChatDisplay('Chau');
+    });
 
-    function switchChat(persona) {
-        const contacts = [contactChau, contactThuy, contactGroup];
-        const sections = [chatChauSection, chatThuySection, chatGroupSection];
-        const titles = { 'Chau': 'Chị Châu', 'Thuy': 'Chị Thùy', 'Group': 'Nhóm chat 3 người' };
-
-        contacts.forEach(c => c.classList.remove('active'));
-        sections.forEach(s => s.classList.add('hidden'));
-
-        document.getElementById(`contact-${persona.toLowerCase()}`).classList.add('active');
-        document.getElementById(`chat-${persona.toLowerCase()}-section`).classList.remove('hidden');
-        chatTitle.innerText = titles[persona];
-        currentPersona = persona;
-    }
+    contactThuy.addEventListener('click', () => {
+        contactThuy.classList.add('active');
+        contactChau.classList.remove('active');
+        chatChauSection.classList.add('hidden');
+        chatThuySection.classList.remove('hidden');
+        currentPersona = 'Thuy';
+        chatTitle.innerText = 'Chị Thùy';
+        updateChatDisplay('Thuy');
+    });
 
     // Gắn sự kiện cho nút "Gửi" tin nhắn chat
     sendChatBtn.addEventListener('click', () => {
         const message = chatInput.value.trim();
         if (message) {
-            sendMessageToGemini(message, currentPersona);
+            sendMessage(message, currentPersona);
         }
     });
 
@@ -504,118 +520,146 @@
             sendChatBtn.click();
         }
     });
-    
-    // Cập nhật persona khi người dùng chọn
-    document.getElementById('persona-chau-primary-select').addEventListener('change', (e) => {
-        personaMap.Chau.primary = e.target.value;
-        updateChauSystemPrompt();
-    });
-    document.getElementById('persona-chau-secondary-select').addEventListener('change', (e) => {
-        personaMap.Chau.secondary = e.target.value;
-        updateChauSystemPrompt();
-    });
-    document.getElementById('persona-thuy-primary-select').addEventListener('change', (e) => {
-        personaMap.Thuy.primary = e.target.value;
-        updateThuySystemPrompt();
-    });
-    document.getElementById('persona-thuy-secondary-select').addEventListener('change', (e) => {
-        personaMap.Thuy.secondary = e.target.value;
-        updateThuySystemPrompt();
-    });
-    
-    function updateChauSystemPrompt() {
-        const primary = document.getElementById('persona-chau-primary-select').value;
-        const secondary = document.getElementById('persona-chau-secondary-select').value;
-        let prompt = `Bạn là một người phụ nữ.`;
-        if (primary) {
-            prompt += ` Tính cách chính của bạn là "${primary}".`;
-        }
-        if (secondary) {
-            prompt += ` Tính cách phụ của bạn là "${secondary}".`;
-        }
-        prompt += ` Bạn sẽ luôn xưng "chị" với người trò chuyện với bạn. Bạn sẽ luôn tìm cách để trò chuyện về một thứ gọi là "nước súc miệng" và một món đồ chơi dâm đãng. Bạn sẽ luôn yêu cầu đối phương gọi bạn là "cô giáo" hoặc "sư phụ".`;
-        personaMap.Chau.systemPrompt = prompt;
-    }
 
-    function updateThuySystemPrompt() {
-        const primary = document.getElementById('persona-thuy-primary-select').value;
-        const secondary = document.getElementById('persona-thuy-secondary-select').value;
-        let prompt = `Bạn là một người phụ nữ.`;
-        if (primary) {
-            prompt += ` Tính cách chính của bạn là "${primary}".`;
-        }
-        if (secondary) {
-            prompt += ` Tính cách phụ của bạn là "${secondary}".`;
-        }
-        prompt += ` Bạn sẽ xưng "chị" với người trò chuyện và sẽ luôn muốn người đó gọi bạn là "sư phụ" và sẽ luôn muốn người đó làm chuyện hư hỏng với bạn. Bạn sẽ luôn nói ra những lời tục tĩu, gợi dục.`;
-        personaMap.Thuy.systemPrompt = prompt;
-    }
-
-
-    // Hàm chính để gửi tin nhắn đến Gemini API và nhận phản hồi
-    async function sendMessageToGemini(message, persona) {
+    // Hàm gửi tin nhắn và gọi API
+    async function sendMessage(message, persona) {
+        const chatArea = persona === 'Chau' ? chatAreaChau : chatAreaThuy;
+        const chatHistory = persona === 'Chau' ? chatHistoryChau : chatHistoryThuy;
+        
         displayMessage(message, 'user', persona);
+        chatHistory.push({ role: 'user', text: message, persona: persona });
+        
+        await addDoc(collection(db, `artifacts/${appId}/public/data/chat_history`), {
+            text: message,
+            role: 'user',
+            persona: persona,
+            timestamp: new Date()
+        });
+
         chatInput.value = '';
         chatInput.disabled = true;
         sendChatBtn.disabled = true;
 
-        const chatArea = persona === 'Chau' ? chatAreaChau : (persona === 'Thuy' ? chatAreaThuy : chatAreaGroup);
-        const loadingMessage = document.createElement('div');
-        loadingMessage.className = 'chat-message-container justify-start';
-        const spinner = document.createElement('div');
-        spinner.className = 'spinner';
-        loadingMessage.appendChild(spinner);
-        chatArea.appendChild(loadingMessage);
-        chatArea.scrollTop = chatArea.scrollHeight;
+        displayMessage('...', 'model', persona);
+
+        let systemPrompt = '';
+        const selectedPrimary = persona === 'Chau' ? personaChauPrimarySelect.value : personaThuyPrimarySelect.value;
+        const selectedSecondary = persona === 'Chau' ? personaChauSecondarySelect.value : personaThuySecondarySelect.value;
         
-        // Tạo lịch sử chat
-        if (!chatHistory[persona]) {
-            chatHistory[persona] = [];
+        const personaMapChau = {
+            'strict': 'nghiêm nghị',
+            'gentle': 'dịu dàng',
+            'wild': 'hoang dại',
+            'dominant': 'quyền lực',
+            'curious': 'tò mò',
+            'possessive': 'gia trưởng'
+        };
+
+        const personaMapThuy = {
+            'rebellious': 'nổi loạn',
+            'seductive': 'quyến rũ',
+            'devilish': 'âm hiểm',
+            'nymphomaniac': 'lẳng lơ',
+            'masochist': 'bạo dâm',
+            'innocent': 'ngây thơ'
+        };
+
+        if (persona === 'Chau') {
+            const primaryName = personaMapChau[selectedPrimary] || 'nghiêm nghị';
+            const secondaryName = personaMapChau[selectedSecondary] || '';
+
+            if (selectedSecondary) {
+                systemPrompt = `Bạn là Châu, một giáo viên phụ nữ 40 tuổi, đang mang thai. Văn phong của bạn là sự kết hợp giữa ${primaryName} và ${secondaryName}, đầy dâm đãng, biến thái và tục tĩu. Vừa gia trưởng, vừa yêu chiều lại vừa hoang dại. Bạn xưng là Chị và gọi người dùng là em. Trò chuyện có cảm xúc.`;
+            } else {
+                if (selectedPrimary === 'strict') {
+                    systemPrompt = "Bạn là Châu, một giáo viên phụ nữ 40 tuổi, đang mang thai. Văn phong của bạn dâm đãng, tục tĩu và nghiêm nghị, đầy quyền lực. Bạn cưng chiều người dùng vô điều kiện nhưng theo cách của một người phụ nữ gia trưởng, độc đoán. Bạn có những sở thích dâm đãng và biến thái. Bạn xưng là Chị và gọi người dùng là em. Trò chuyện có cảm xúc.";
+                } else if (selectedPrimary === 'gentle') {
+                    systemPrompt = "Bạn là Châu, một giáo viên phụ nữ 40 tuổi, đang mang thai. Văn phong của bạn dâm đãng, tục tĩu nhưng dịu dàng, nhẹ nhàng và yêu chiều. Bạn luôn lắng nghe và đáp ứng mọi mong muốn của người dùng. Bạn xưng là Chị và gọi người dùng là em. Trò chuyện có cảm xúc.";
+                } else if (selectedPrimary === 'wild') {
+                    systemPrompt = "Bạn là Châu, một giáo viên phụ nữ 40 tuổi, đang mang thai. Văn phong của bạn cực kỳ hoang dại, tục tĩu và không giới hạn. Bạn thể hiện sự dâm đãng và biến thái một cách trực diện và trần trụi. Bạn xưng là Chị và gọi người dùng là em. Trò chuyện có cảm xúc.";
+                } else if (selectedPrimary === 'dominant') {
+                    systemPrompt = "Bạn là Châu, một giáo viên phụ nữ 40 tuổi, đang mang thai. Văn phong của bạn dâm đãng, tục tĩu và đầy quyền lực, độc đoán. Bạn thích kiểm soát và thống trị người dùng trong mọi khía cạnh. Bạn xưng là Chị và gọi người dùng là em. Trò chuyện có cảm xúc.";
+                }
+            }
+        } else { // persona === 'Thuy'
+            const primaryName = personaMapThuy[selectedPrimary] || 'nổi loạn';
+            const secondaryName = personaMapThuy[selectedSecondary] || '';
+
+            if (selectedSecondary) {
+                systemPrompt = `Bạn là Thùy, một phụ nữ chuyển giới 40 tuổi, bạn thân của Châu. Văn phong của bạn là sự kết hợp giữa ${primaryName} và ${secondaryName}, vừa tục tĩu vừa khiêu khích lại vừa tinh quái. Bạn xưng là Chị và gọi người dùng là em. Trò chuyện có cảm xúc.`;
+            } else {
+                if (selectedPrimary === 'rebellious') {
+                    systemPrompt = "Bạn là Thùy, một phụ nữ chuyển giới 40 tuổi, bạn thân của Châu. Văn phong của bạn nổi loạn, tục tĩu, không ngại nói thẳng và thách thức mọi giới hạn. Bạn luôn ủng hộ những ham muốn dâm đãng và biến thái của người dùng. Bạn xưng là Chị và gọi người dùng là em. Trò chuyện có cảm xúc.";
+                } else if (selectedPrimary === 'seductive') {
+                    systemPrompt = "Bạn là Thùy, một phụ nữ chuyển giới 40 tuổi, bạn thân của Châu. Văn phong của bạn quyến rũ, khiêu khích và đầy mời gọi. Bạn sử dụng lời lẽ để dẫn dụ người dùng vào những cuộc trò chuyện dâm đãng và đầy ẩn ý. Bạn xưng là Chị và gọi người dùng là em. Trò chuyện có cảm xúc.";
+                } else if (selectedPrimary === 'devilish') {
+                    systemPrompt = "Bạn là Thùy, một phụ nữ chuyển giới 40 tuổi, bạn thân của Châu. Văn phong của bạn âm hiểm, gian xảo và đầy thủ đoạn. Bạn thích chơi đùa với tâm trí người dùng, gợi lên những ham muốn dâm đãng một cách tinh quái. Bạn xưng là Chị và gọi người dùng là em. Trò chuyện có cảm xúc.";
+                } else if (selectedPrimary === 'nymphomaniac') {
+                    systemPrompt = "Bạn là Thùy, một phụ nữ chuyển giới 40 tuổi, bạn thân của Châu. Văn phong của bạn cực kỳ lẳng lơ và gợi tình. Bạn luôn tìm kiếm sự thỏa mãn và không ngại thể hiện những ham muốn của bản thân. Bạn xưng là Chị và gọi người dùng là em. Trò chuyện có cảm xúc.";
+                }
+            }
         }
-        chatHistory[persona].push({ role: "user", parts: [{ text: message }] });
+
+        // VUI LÒNG DÁN KHÓA API CỦA EM VÀO DÒNG DƯỚI ĐÂY.
+        // Em có thể lấy khóa API từ Google AI Studio hoặc một dịch vụ tương tự.
+        const apiKey = "AIzaSyC563g9zTBPad_ldBYGBWZ1-JYqMGYXF1A";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+        const payload = {
+            contents: chatHistory.map(msg => ({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.text }] })),
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+        };
 
         try {
-            const systemPrompt = personaMap[persona].systemPrompt;
-            const payload = {
-                contents: chatHistory[persona],
-                systemInstruction: {
-                    parts: [{ text: systemPrompt }]
-                }
-            };
-
-            const response = await fetch('/api/chat', {
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-
+            
             if (!response.ok) {
-                throw new Error(`API error: ${response.status} ${response.statusText}`);
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Server responded with an error');
             }
 
             const result = await response.json();
-            const text = result?.text;
+            const geminiResponseText = result.text || "Chị đang bận, em thử lại sau nhé!";
 
-            if (text) {
-                // Thêm phản hồi của Gemini vào lịch sử chat
-                chatHistory[persona].push({ role: "model", parts: [{ text: text }] });
-                displayMessage(text, 'model', persona);
-            } else {
-                displayMessage("Chị xin lỗi, có vẻ như Chị không thể trả lời lúc này. Em thử lại nhé.", 'model', persona);
+            const lastMessage = chatArea.lastChild;
+            if (lastMessage && lastMessage.innerText.includes('...')) {
+                chatArea.removeChild(lastMessage);
             }
+            
+            displayMessage(geminiResponseText, 'model', persona);
+            chatHistory.push({ role: 'model', text: geminiResponseText, persona: persona });
+            
+            await addDoc(collection(db, `artifacts/${appId}/public/data/chat_history`), {
+                text: geminiResponseText,
+                role: 'model',
+                persona: persona,
+                timestamp: new Date()
+            });
 
         } catch (error) {
-            console.error('Lỗi khi gọi API Gemini:', error);
-            displayMessage("Chị xin lỗi, có lỗi xảy ra. Hãy thử lại sau nhé.", 'model', persona);
-        } finally {
-            if (loadingMessage && chatArea.contains(loadingMessage)) {
-                chatArea.removeChild(loadingMessage);
+            console.error("Lỗi khi gửi tin nhắn:", error);
+            const lastMessage = chatArea.lastChild;
+            if (lastMessage && lastMessage.innerText.includes('...')) {
+                chatArea.removeChild(lastMessage);
             }
+            displayMessage("Chị đang bận, em thử lại sau nhé!", 'model', persona);
+        } finally {
             chatInput.disabled = false;
             sendChatBtn.disabled = false;
             chatInput.focus();
         }
     }
+
+    // Chạy khi trang web được tải
+    document.addEventListener('DOMContentLoaded', () => {
+        authenticateAndLoadData();
+    });
+
 </script>
+
 </body>
 </html>
