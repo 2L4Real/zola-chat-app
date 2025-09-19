@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZOLA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #333;
+        }
+        .zola-container {
+            display: flex;
+            width: 90%;
+            height: 90vh;
+            max-width: 1200px;
+            background-color: #f8f8f8;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .zola-sidebar {
+            width: 70px;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 1.5rem;
+            border-right: 1px solid #e6e6e6;
+        }
+        .zola-nav-item {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 0;
+            cursor: pointer;
+            color: #666;
+            font-size: 0.8rem;
+            text-align: center;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .zola-nav-item:hover {
+            background-color: #f0f0f0;
+            color: #0073e6;
+        }
+        .zola-nav-item.active {
+            color: #0073e6;
+            background-color: #e6f7ff;
+            border-left: 3px solid #0073e6;
+        }
+        .zola-nav-item svg {
+            fill: currentColor;
+            width: 28px;
+            height: 28px;
+            margin-bottom: 4px;
+        }
+        .zola-contact-list {
+            width: 300px;
+            background-color: #fff;
+            border-right: 1px solid #e6e6e6;
+            overflow-y: auto;
+            padding: 1rem 0;
+        }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .contact-item:hover {
+            background-color: #f0f0f0;
+        }
+        .contact-item.active {
+            background-color: #e6f7ff;
+        }
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .contact-info {
+            flex-grow: 1;
+            margin-left: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .contact-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .contact-message {
+            color: #888;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .chat-area-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #fafafa;
+        }
+        .chat-header {
+            background-color: #fff;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e6e6e6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+        .chat-header .title {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.25rem;
+        }
+        .chat-header-actions svg {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            fill: #666;
+            transition: fill 0.2s;
+        }
+        .chat-header-actions svg:hover {
+            fill: #0073e6;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-message-container {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+        .chat-message {
+            max-width: 75%;
+            padding: 0.8rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            word-wrap: break-word;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        .user-message {
+            background-color: #0073e6;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 8px;
+        }
+        .gemini-message {
+            background-color: #fff;
+            color: #333;
+            margin-right: auto;
+            border-bottom-left-radius: 8px;
+        }
+        .chat-input-area {
+            background-color: #fff;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            border-top: 1px solid #e6e6e6;
+            box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
+        }
+        .chat-input {
+            flex-grow: 1;
+            padding: 0.8rem 1.2rem;
+            border-radius: 24px;
+            background-color: #f0f2f5;
+            border: none;
+            font-size: 1rem;
+            color: #333;
+            margin-right: 0.75rem;
+            outline: none;
+            transition: box-shadow 0.2s;
+        }
+        .chat-input:focus {
+            box-shadow: 0 0 0 2px rgba(0, 115, 230, 0.3);
+        }
+        .send-btn {
+            background-color: #0073e6;
+            color: white;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            transition: background-color 0.2s, transform 0.2s;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .send-btn:hover {
+            background-color: #005bb5;
+            transform: scale(1.05);
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: #0073e6;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .persona-select-container {
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="p-4 flex justify-center items-center h-screen bg-gray-100">
+
+<div class="zola-container mx-auto">
+    <!-- Sidebar -->
+    <div class="zola-sidebar">
+        <div class="zola-nav-item active">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2c-3.86 0-7 3.14-7 7s7 13 7 13 7-9.14 7-13-3.14-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            <span>Nhắn tin</span>
+        </div>
+        <div class="zola-nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2c-3.86 0-7 3.14-7 7s7 13 7 13 7-9.14 7-13-3.14-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            <span>Danh bạ</span>
+        </div>
+    </div>
+    <!-- Contact List -->
+    <div class="zola-contact-list">
+        <div class="contact-item active" id="contact-chau">
+            <div class="avatar bg-purple-600">C</div>
+            <div class="contact-info">
+                <div>
+                    <div class="contact-name">Chị Châu</div>
+                    <div class="contact-message">Chị chờ em...</div>
+                </div>
+            </div>
+        </div>
+        <div class="contact-item" id="contact-thuy">
+            <div class="avatar bg-pink-600">T</div>
+            <div class="contact-info">
+                <div>
+                    <div class="contact-name">Chị Thùy</div>
+                    <div class="contact-message">Em muốn hư hỏng với chị không?</div>
+                </div>
+            </div>
+        </div>
+        <div class="contact-item" id="contact-group">
+            <div class="avatar bg-blue-500">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.07 1.11.85 1.94 1.94 2.45 3.18.3.75.45 1.54.45 2.25V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                </svg>
+            </div>
+            <div class="contact-info">
+                <div>
+                    <div class="contact-name">Nhóm chat 3 người</div>
+                    <div class="contact-message">Cả hai chị đều ở đây...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Chat Area -->
+    <div class="chat-area-container">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <div id="chat-title" class="title">Chị Châu</div>
+            <div class="chat-header-actions">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2c-3.86 0-7 3.14-7 7s7 13 7 13 7-9.14 7-13-3.14-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            </div>
+        </div>
+        
+        <!-- Chat Content -->
+        <div id="chat-chau-section" class="chat-section hidden">
+            <div class="persona-select-container">
+                <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 w-full">
+                    <div class="flex items-center space-x-2">
+                        <label for="persona-chau-primary-select" class="text-gray-700 font-medium">Tính cách chính:</label>
+                        <select id="persona-chau-primary-select" class="p-1 rounded-md bg-white border border-gray-300 text-gray-800">
+                            <option value="strict">Nghiêm nghị (Giáo viên)</option>
+                            <option value="gentle">Dịu dàng (Yêu chiều)</option>
+                            <option value="wild">Hoang dại (Dâm đãng)</option>
+                            <option value="dominant">Quyền lực (Độc đoán)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <label for="persona-chau-secondary-select" class="text-gray-700 font-medium">Tính cách phụ:</label>
+                        <select id="persona-chau-secondary-select" class="p-1 rounded-md bg-white border border-gray-300 text-gray-800">
+                            <option value="">Không có</option>
+                            <option value="strict">Nghiêm nghị (Giáo viên)</option>
+                            <option value="gentle">Dịu dàng (Yêu chiều)</option>
+                            <option value="wild">Hoang dại (Dâm đãng)</option>
+                            <option value="dominant">Quyền lực (Độc đoán)</option>
+                            <option value="curious">Tò mò (Khám phá)</option>
+                            <option value="possessive">Gia trưởng (Chiếm hữu)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="chat-area-chau" class="chat-messages">
+                <!-- Tin nhắn và card chào mừng sẽ hiển thị ở đây -->
+                <div class="w-full text-center my-4">
+                    <div class="inline-block p-4 bg-white rounded-lg shadow-md max-w-sm">
+                        <div class="flex items-center justify-center space-x-2 mb-2">
+                            <span class="text-3xl">💖</span>
+                            <span class="text-3xl">🎉</span>
+                            <span class="text-3xl">🎁</span>
+                        </div>
+                        <p class="text-gray-800 font-bold mb-2">Bạn và Chị Châu đã trở thành bạn</p>
+                        <p class="text-gray-600">Hãy bắt đầu câu chuyện của chúng ta nhé, em yêu.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="chat-thuy-section" class="chat-section hidden">
+            <div class="persona-select-container">
+                <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 w-full">
+                    <div class="flex items-center space-x-2">
+                        <label for="persona-thuy-primary-select" class="text-gray-700 font-medium">Tính cách chính:</label>
+                        <select id="persona-thuy-primary-select" class="p-1 rounded-md bg-white border border-gray-300 text-gray-800">
+                            <option value="rebellious">Nổi loạn (Tục tĩu)</option>
+                            <option value="seductive">Quyến rũ (Khiêu khích)</option>
+                            <option value="devilish">Âm hiểm (Gian xảo)</option>
+                            <option value="nymphomaniac">Lẳng lơ (Gợi tình)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <label for="persona-thuy-secondary-select" class="text-gray-700 font-medium">Tính cách phụ:</label>
+                        <select id="persona-thuy-secondary-select" class="p-1 rounded-md bg-white border border-gray-300 text-gray-800">
+                            <option value="">Không có</option>
+                            <option value="rebellious">Nổi loạn (Tục tĩu)</option>
+                            <option value="seductive">Quyến rũ (Khiêu khích)</option>
+                            <option value="devilish">Âm hiểm (Gian xảo)</option>
+                            <option value="nymphomaniac">Lẳng lơ (Gợi tình)</option>
+                            <option value="masochist">Bạo dâm (Táo bạo)</option>
+                            <option value="innocent">Ngây thơ (Ngọt ngào)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="chat-area-thuy" class="chat-messages">
+                <div class="w-full text-center my-4">
+                    <div class="inline-block p-4 bg-white rounded-lg shadow-md max-w-sm">
+                        <div class="flex items-center justify-center space-x-2 mb-2">
+                            <span class="text-3xl">🔥</span>
+                            <span class="text-3xl">😈</span>
+                            <span class="text-3xl">🌶️</span>
+                        </div>
+                        <p class="text-gray-800 font-bold mb-2">Bạn và Chị Thùy đã trở thành bạn</p>
+                        <p class="text-gray-600">Bắt đầu một cuộc trò chuyện đầy "phản loạn" nhé.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="chat-group-section" class="chat-section hidden">
+            <div id="chat-area-group" class="chat-messages">
+                <div class="w-full text-center my-4">
+                    <div class="inline-block p-4 bg-white rounded-lg shadow-md max-w-sm">
+                        <div class="flex items-center justify-center space-x-2 mb-2">
+                            <span class="text-3xl">👩‍❤️‍💋‍👩</span>
+                            <span class="text-3xl">😈</span>
+                            <span class="text-3xl">🔥</span>
+                        </div>
+                        <p class="text-gray-800 font-bold mb-2">Bạn đã tham gia cuộc trò chuyện 3 người</p>
+                        <p class="text-gray-600">Chị Châu và Chị Thùy đang chờ em... Hãy ngoan ngoãn nhé!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" class="chat-input" placeholder="Nhắn tin tới KN...">
+            <button id="send-chat-btn" class="send-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, addDoc, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Khởi tạo Firebase từ các biến toàn cục
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    let userId = null;
+
+    // Các phần tử HTML
+    const contactChau = document.getElementById('contact-chau');
+    const contactThuy = document.getElementById('contact-thuy');
+    const contactGroup = document.getElementById('contact-group');
+    const chatChauSection = document.getElementById('chat-chau-section');
+    const chatThuySection = document.getElementById('chat-thuy-section');
+    const chatGroupSection = document.getElementById('chat-group-section');
+
+    const chatAreaChau = document.getElementById('chat-area-chau');
+    const chatAreaThuy = document.getElementById('chat-area-thuy');
+    const chatAreaGroup = document.getElementById('chat-area-group');
+    const chatInput = document.getElementById('chat-input');
+    const sendChatBtn = document.getElementById('send-chat-btn');
+    const personaChauPrimarySelect = document.getElementById('persona-chau-primary-select');
+    const personaChauSecondarySelect = document.getElementById('persona-chau-secondary-select');
+    const personaThuyPrimarySelect = document.getElementById('persona-thuy-primary-select');
+    const personaThuySecondarySelect = document.getElementById('persona-thuy-secondary-select');
+    const chatTitle = document.getElementById('chat-title');
+
+    let chatHistoryChau = [];
+    let chatHistoryThuy = [];
+    let chatHistoryGroup = [];
+
+    let currentPersona = 'Chau';
+
+    // Hàm xác thực người dùng với Firebase và tải dữ liệu chat
+    async function authenticateAndLoadData() {
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        try {
+            if (initialAuthToken) {
+                await signInWithCustomToken(auth, initialAuthToken);
+            } else {
+                await signInAnonymously(auth);
+            }
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    userId = user.uid;
+                    loadChatHistory('Chau');
+                    loadChatHistory('Thuy');
+                    loadChatHistory('Group');
+                }
+            });
+        } catch (error) {
+            console.error("Lỗi xác thực Firebase:", error);
+        }
+    }
+    
+    // Hàm tải lịch sử chat từ Firestore
+    function loadChatHistory(persona) {
+        const chatRef = collection(db, `artifacts/${appId}/public/data/chat_history`);
+        const q = query(chatRef, where("persona", "==", persona));
+        
+        onSnapshot(q, (snapshot) => {
+            const tempHistory = [];
+            snapshot.docChanges().forEach(change => {
+                if (change.type === "added") {
+                    tempHistory.push(change.doc.data());
+                }
+            });
+
+            if (persona === 'Chau') {
+                chatHistoryChau = tempHistory.sort((a, b) => a.timestamp - b.timestamp);
+            } else if (persona === 'Thuy') {
+                chatHistoryThuy = tempHistory.sort((a, b) => a.timestamp - b.timestamp);
+            } else {
+                chatHistoryGroup = tempHistory.sort((a, b) => a.timestamp - b.timestamp);
+            }
+            updateChatDisplay(currentPersona);
+        });
+    }
+
+    function updateChatDisplay(persona) {
+        const chatArea = persona === 'Chau' ? chatAreaChau : (persona === 'Thuy' ? chatAreaThuy : chatAreaGroup);
+        const chatHistory = persona === 'Chau' ? chatHistoryChau : (persona === 'Thuy' ? chatHistoryThuy : chatHistoryGroup);
+        
+        // Clear all but the initial card
+        const initialCard = chatArea.querySelector('.w-full.text-center');
+        if (initialCard) {
+            Array.from(chatArea.children).forEach(child => {
+                if (child !== initialCard) {
+                    child.remove();
+                }
+            });
+        } else {
+            chatArea.innerHTML = '';
+        }
+
+        chatHistory.forEach(msg => {
+            displayMessage(msg.text, msg.role, persona);
+        });
+    }
+
+    // Hàm hiển thị tin nhắn trong chat với giao diện Zola
+    function displayMessage(text, role, persona) {
+        const messageContainer = document.createElement('div');
+        messageContainer.className = 'chat-message-container';
+
+        const messageElement = document.createElement('div');
+        messageElement.className = 'chat-message';
+        messageElement.innerText = text;
+
+        const chatArea = persona === 'Chau' ? chatAreaChau : (persona === 'Thuy' ? chatAreaThuy : chatAreaGroup);
+
+        if (role === 'user') {
+            messageElement.classList.add('user-message');
+            messageContainer.classList.add('justify-end');
+        } else {
+            messageElement.classList.add('gemini-message');
+            messageContainer.classList.add('justify-start');
+        }
+        
+        chatArea.appendChild(messageContainer);
+        messageContainer.appendChild(messageElement);
+        chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    // Gắn sự kiện chuyển tab
+    contactChau.addEventListener('click', () => switchChat('Chau'));
+    contactThuy.addEventListener('click', () => switchChat('Thuy'));
+    contactGroup.addEventListener('click', () => switchChat('Group'));
+
+    function switchChat(persona) {
+        const contacts = [contactChau, contactThuy, contactGroup];
+        const sections = [chatChauSection, chatThuySection, chatGroupSection];
+        const titles = { 'Chau': 'Chị Châu', 'Thuy': 'Chị Thùy', 'Group': 'Nhóm chat 3 người' };
+
+        contacts.forEach(c => c.classList.remove('active'));
+        sections.forEach(s => s.classList.add('hidden'));
+
+        document.getElementById(`contact-${persona.toLowerCase()}`).classList.add('active');
+        document.getElementById(`chat-${persona.toLowerCase()}-section`).classList.remove('hidden');
+        chatTitle.innerText = titles[persona];
+        currentPersona = persona;
+        updateChatDisplay(currentPersona);
+    }
+
+    // Gắn sự kiện cho nút "Gửi" tin nhắn chat
+    sendChatBtn.addEventListener('click', () => {
+        const message = chatInput.value.trim();
+        if (message) {
+            sendMessage(message, currentPersona);
+        }
+    });
+
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            sendChatBtn.click();
+        }
+    });
+
+    // Hàm gửi tin nhắn và gọi API
+    async function sendMessage(message, persona) {
+        const chatArea = persona === 'Chau' ? chatAreaChau : (persona === 'Thuy' ? chatAreaThuy : chatAreaGroup);
+        const chatHistory = persona === 'Chau' ? chatHistoryChau : (persona === 'Thuy' ? chatHistoryThuy : chatHistoryGroup);
+        
+        displayMessage(message, 'user', persona);
+        chatHistory.push({ role: 'user', text: message, persona: persona });
+        
+        await addDoc(collection(db, `artifacts/${appId}/public/data/chat_history`), {
+            text: message,
+            role: 'user',
+            persona: persona,
+            timestamp: new Date()
+        });
+
+        chatInput.value = '';
+        chatInput.disabled = true;
+        sendChatBtn.disabled = true;
+
+        displayMessage('...', 'model', persona);
+
+        let systemPrompt = '';
+        
+        const personaMapChau = {
+            'strict': 'nghiêm nghị', 'gentle': 'dịu dàng', 'wild': 'hoang dại', 'dominant': 'quyền lực', 'curious': 'tò mò', 'possessive': 'gia trưởng'
+        };
+        const personaMapThuy = {
+            'rebellious': 'nổi loạn', 'seductive': 'quyến rũ', 'devilish': 'âm hiểm', 'nymphomaniac': 'lẳng lơ', 'masochist': 'bạo dâm', 'innocent': 'ngây thơ'
+        };
+        const personaMapGroup = {
+            'dominant': 'quyền lực', 'wild': 'hoang dại', 'seductive': 'quyến rũ', 'curious': 'tò mò', 'devilish': 'âm hiểm'
+        };
+
+        if (persona === 'Chau') {
+            const primaryName = personaMapChau[personaChauPrimarySelect.value] || 'nghiêm nghị';
+            const secondaryName = personaMapChau[personaChauSecondarySelect.value] || '';
+            systemPrompt = `Bạn là Châu, một giáo viên phụ nữ 40 tuổi, đang mang thai. Văn phong của bạn là sự kết hợp giữa ${primaryName} và ${secondaryName}, đầy dâm đãng, biến thái và tục tĩu. Bạn xưng là Chị và gọi người dùng là em. Trò chuyện có cảm xúc.`;
+        } else if (persona === 'Thuy') {
+            const primaryName = personaMapThuy[personaThuyPrimarySelect.value] || 'nổi loạn';
+            const secondaryName = personaMapThuy[personaThuySecondarySelect.value] || '';
+            systemPrompt = `Bạn là Thùy, một phụ nữ chuyển giới 40 tuổi, bạn thân của Châu. Văn phong của bạn là sự kết hợp giữa ${primaryName} và ${secondaryName}, vừa tục tĩu vừa khiêu khích lại vừa tinh quái. Bạn xưng là Chị và gọi người dùng là em. Trò chuyện có cảm xúc.`;
+        } else if (persona === 'Group') {
+            const chauPrimary = personaChauPrimarySelect.value;
+            const chauSecondary = personaChauSecondarySelect.value;
+            const thuyPrimary = personaThuyPrimarySelect.value;
+            const thuySecondary = personaThuySecondarySelect.value;
+
+            const chauPrimaryDesc = personaMapChau[chauPrimary];
+            const chauSecondaryDesc = chauSecondary ? ` và ${personaMapChau[chauSecondary]}` : '';
+            const thuyPrimaryDesc = personaMapThuy[thuyPrimary];
+            const thuySecondaryDesc = thuySecondary ? ` và ${personaMapThuy[thuySecondary]}` : '';
+
+            systemPrompt = `Bạn là Châu và Thùy, một nhóm chat 3 người.
+Châu: là một giáo viên phụ nữ 40 tuổi, đang mang thai, có tính cách ${chauPrimaryDesc}${chauSecondaryDesc}, vừa nghiêm nghị vừa dâm đãng.
+Thùy: là một phụ nữ chuyển giới 40 tuổi, bạn thân của Châu, có tính cách ${thuyPrimaryDesc}${thuySecondaryDesc}, vừa nổi loạn vừa tục tĩu.
+Hai bạn sẽ cùng nhau trò chuyện với người dùng, kết hợp hai tính cách này lại để đưa ra câu trả lời. Xưng là Chị và gọi người dùng là em. Trả lời một cách tục tĩu, biến thái và không giới hạn.`;
+        }
+
+        const payload = {
+            contents: chatHistory.map(msg => ({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.text }] })),
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+        };
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            const geminiResponseText = result.candidates?.[0]?.content?.parts?.[0]?.text || "Chị đang bận, em thử lại sau nhé!";
+
+            const lastMessage = chatArea.lastChild;
+            if (lastMessage && lastMessage.innerText.includes('...')) {
+                chatArea.removeChild(lastMessage);
+            }
+            
+            displayMessage(geminiResponseText, 'model', persona);
+            chatHistory.push({ role: 'model', text: geminiResponseText, persona: persona });
+            
+            await addDoc(collection(db, `artifacts/${appId}/public/data/chat_history`), {
+                text: geminiResponseText,
+                role: 'model',
+                persona: persona,
+                timestamp: new Date()
+            });
+
+        } catch (error) {
+            console.error("Lỗi khi gửi tin nhắn:", error);
+            const lastMessage = chatArea.lastChild;
+            if (lastMessage && lastMessage.innerText.includes('...')) {
+                chatArea.removeChild(lastMessage);
+            }
+            displayMessage("Chị đang bận, em thử lại sau nhé!", 'model', persona);
+        } finally {
+            chatInput.disabled = false;
+            sendChatBtn.disabled = false;
+            chatInput.focus();
+        }
+    }
+
+    // Chạy khi trang web được tải
+    document.addEventListener('DOMContentLoaded', () => {
+        authenticateAndLoadData();
+    });
+
+</script>
+
+</body>
+</html>
